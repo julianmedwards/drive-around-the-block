@@ -4,7 +4,14 @@ function tick() {
     } else {
         car.facing = 'east'
     }
-    drive(car, 10) //Drive the car
+    if (car.stopped === undefined) {
+        car.stopped = false
+    }
+    if (car.stopped === false) {
+        drive(car, 15) //Drive the car
+    } else {
+        console.log('Car stopped, not running drive.')
+    }
 }
 
 function drive(car, increment) {
@@ -23,10 +30,17 @@ function drive(car, increment) {
             // Check intersection
             break
         case 'f':
-            slowToStop(car, increment)
+            increment = increment / 2.5
+            car = slowToStop(car, increment, currTile)
             break
         default:
-            let next = getNextTile(car, 1)
+            let next = getTile(
+                car.tilePos[0],
+                car.tilePos[1],
+                car.rowIncrement,
+                car.columnIncrement,
+                1
+            )
             switch (next.type) {
                 case 't':
                 case 'f':
@@ -39,10 +53,16 @@ function drive(car, increment) {
                     break
                 case 'g':
                 case 'undefined':
-                    slowToStop(car, increment)
+                    car = slowToStop(car, increment, currTile)
                     break
                 default:
-                    let following = getNextTile(car, 2)
+                    let following = getTile(
+                        car.tilePos[0],
+                        car.tilePos[1],
+                        car.rowIncrement,
+                        car.columnIncrement,
+                        2
+                    )
                     switch (following.type) {
                         case 'undefined':
                         // Next tile is g or f.
@@ -110,22 +130,21 @@ function getTilePosition(car) {
     return [Number(row), Number(column)]
 }
 
-function getNextTile(car, multiplier) {
-    let row = car.tilePos[0]
-    let column = car.tilePos[1]
-    let rowIncrement = car.rowIncrement * multiplier
-    let columnIncrement = car.columnIncrement * multiplier
+function getTile(row, column, rowIncrement, columnIncrement, multiplier) {
+    if (multiplier) {
+        rowIncrement = rowIncrement * multiplier
+        columnIncrement = columnIncrement * multiplier
+    }
 
-    let nextTile = getTile(row, column, rowIncrement, columnIncrement)
-
-    return nextTile
-}
-
-function getTile(row, column, rowIncrement, columnIncrement) {
     let tileClass = `pos-${row + rowIncrement}-${column + columnIncrement}`
     let tileElement = document.getElementsByClassName(tileClass)
     let tileType = tileElement[0].getAttribute('data-square-type')
-    return {tile: tileElement[0], type: tileType}
+    return {
+        tile: tileElement[0],
+        type: tileType,
+        row: row + rowIncrement,
+        column: column + columnIncrement,
+    }
 }
 
 function move(car, increment) {
@@ -138,6 +157,19 @@ function turn(car, increment) {
     car.facing = newFacing
 }
 
-function slowToStop(car, increment) {
+function slowToStop(car, increment, currTile) {
     console.log('Time to stop!')
+    switch (car.facing) {
+        case 'east':
+            if (car.leadingEdge === currTile.column + 99) {
+                console.log('Stopped!')
+                car.stopped = true
+            } else {
+                while (car.leadingEdge + increment > currTile.column + 99) {
+                    increment -= 1
+                }
+                move(car, increment)
+            }
+            return car
+    }
 }
