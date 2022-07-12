@@ -26,8 +26,7 @@ function drive(car, increment) {
             slowToStop(car, increment)
             break
         default:
-            let nextTiles = getNextTwoTiles(car)
-            let next = nextTiles[0]
+            let next = getNextTile(car, 1)
             switch (next.type) {
                 case 't':
                 case 'f':
@@ -43,8 +42,7 @@ function drive(car, increment) {
                     slowToStop(car, increment)
                     break
                 default:
-                    // Call generic getNextTile funct here.
-                    let following = nextTiles[1]
+                    let following = getNextTile(car, 2)
                     switch (following.type) {
                         case 'undefined':
                         // Next tile is g or f.
@@ -93,20 +91,18 @@ function getTilePosition(car) {
     let row
     let column
     if (car.props.top >= 100) {
-        let zeroes = ''
-        for (let i = 0; i < String(car.props.top).length - 1; i++) {
-            zeroes += '0'
+        row = Number(car.props.top.toString()[0])
+        for (let i = 0; i < car.props.top.toString().length - 1; i++) {
+            row += '0'
         }
-        row = Number(String(car.props.top)[0]) + zeroes
     } else {
         row = 0
     }
     if (car.leadingEdge >= 100) {
-        let zeroes = ''
-        for (let i = 0; i < String(car.props.top).length - 1; i++) {
-            zeroes += '0'
+        column = Number(car.leadingEdge.toString()[0])
+        for (let i = 0; i < car.leadingEdge.toString().length - 1; i++) {
+            column += '0'
         }
-        column = Number(String(car.leadingEdge)[0]) + zeroes
     } else {
         column = 0
     }
@@ -114,32 +110,15 @@ function getTilePosition(car) {
     return [Number(row), Number(column)]
 }
 
-// Only guaranteed to handle up to 10x10 tile boards.
-// *Could break into generic getNext (or following) tile function.
-function getNextTwoTiles(car) {
+function getNextTile(car, multiplier) {
     let row = car.tilePos[0]
     let column = car.tilePos[1]
+    let rowIncrement = car.rowIncrement * multiplier
+    let columnIncrement = car.columnIncrement * multiplier
 
-    let nextTile = getTile(row, column, car.rowIncrement, car.columnIncrement)
+    let nextTile = getTile(row, column, rowIncrement, columnIncrement)
 
-    let followingTile
-    if (nextTile.type === 't') {
-        // get turn degrees (meta attr) and select accordingly.
-    } else if (nextTile.type === 'f' || nextTile.type === 'g') {
-        // Leave following undefined.
-    } else {
-        followingTile = getTile(
-            row,
-            column,
-            car.rowIncrement * 2,
-            car.columnIncrement * 2
-        )
-    }
-
-    if (!followingTile) {
-        followingTile = {type: undefined}
-    }
-    return [nextTile, followingTile]
+    return nextTile
 }
 
 function getTile(row, column, rowIncrement, columnIncrement) {
