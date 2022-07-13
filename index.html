@@ -20,6 +20,56 @@
       <input type="button" value="Stop" onclick="stop()" />
       <input type="button" value="Reset" onclick="reset()" />
     </div>
+    <div>
+      <div
+        id="p0"
+        style="
+          display: none;
+          position: absolute;
+          background-color: yellow;
+          width: 5px;
+          height: 5px;
+          content: '';
+          z-index: 1000;
+        "
+      ></div>
+      <div
+        id="p1"
+        style="
+          display: none;
+          position: absolute;
+          background-color: cyan;
+          width: 5px;
+          height: 5px;
+          content: '';
+          z-index: 1000;
+        "
+      ></div>
+      <div
+        id="p2"
+        style="
+          display: none;
+          position: absolute;
+          background-color: cyan;
+          width: 5px;
+          height: 5px;
+          content: '';
+          z-index: 1000;
+        "
+      ></div>
+      <div
+        id="p3"
+        style="
+          display: none;
+          position: absolute;
+          background-color: yellow;
+          width: 5px;
+          height: 5px;
+          content: '';
+          z-index: 1000;
+        "
+      ></div>
+    </div>
     <div id="game-board"></div>
     <script>
       document.querySelector('#game-picker').selectedIndex = 1
