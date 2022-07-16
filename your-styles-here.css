@@ -1,0 +1,8 @@
+.car {
+    width: 81px;
+    height: 81px;
+}
+.car > img {
+    position: relative;
+    top: 21px;
+}

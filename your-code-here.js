@@ -1,5 +1,5 @@
 function tick() {
-    let car = document.querySelector('#car') //get reference to car
+    let car = document.querySelector('#mainCar') //get reference to car
     if (car.facing) {
     } else {
         car.facing = 'east'
@@ -16,7 +16,6 @@ function tick() {
 
 function drive(car, increment) {
     car.props = getProps(car)
-    car.coords = [car.props.left, car.props.top]
     car = initDirection(car)
 
     car.tilePos = getTilePosition(car)
@@ -34,7 +33,7 @@ function drive(car, increment) {
                 break
             case 'f':
                 increment = increment / 2.5
-                car = slowToStop(car, increment, currTile)
+                car = slowToStop(car, increment)
                 break
             default:
                 let next = getTile(
@@ -56,7 +55,7 @@ function drive(car, increment) {
                         break
                     case 'g':
                     case 'undefined':
-                        car = slowToStop(car, increment, currTile)
+                        car = slowToStop(car, increment)
                         break
                     default:
                         let following = getTile(
@@ -93,7 +92,7 @@ function initDirection(car) {
             car.columnIncrement = 100
             break
         case 'south':
-            car.leadingEdge = car.props.top + car.props.width
+            car.leadingEdge = Math.trunc(car.props.top + car.props.height)
             car.rowIncrement = 100
             car.columnIncrement = 0
             break
@@ -112,25 +111,35 @@ function initDirection(car) {
 }
 
 function getTilePosition(car) {
-    let row
-    let column
-    if (car.props.top >= 100) {
-        row = Number(car.props.top.toString()[0])
-        for (let i = 0; i < car.props.top.toString().length - 1; i++) {
-            row += '0'
-        }
+    let row, column, x, y, xResult, yResult
+    if (car.facing === 'west' || car.facing === 'east') {
+        x = car.props.top
     } else {
-        row = 0
+        x = car.props.left
     }
     if (car.leadingEdge >= 100) {
-        column = Number(car.leadingEdge.toString()[0])
+        yResult = Number(car.leadingEdge.toString()[0])
         for (let i = 0; i < car.leadingEdge.toString().length - 1; i++) {
-            column += '0'
+            yResult += '0'
         }
     } else {
-        column = 0
+        yResult = 0
     }
-
+    if (x >= 100) {
+        xResult = Number(x.toString()[0])
+        for (let i = 0; i < x.toString().length - 1; i++) {
+            xResult += '0'
+        }
+    } else {
+        xResult = 0
+    }
+    if (car.facing === 'west' || car.facing === 'east') {
+        row = xResult
+        column = yResult
+    } else {
+        row = yResult
+        column = xResult
+    }
     return [Number(row), Number(column)]
 }
 
@@ -152,7 +161,20 @@ function getTile(row, column, rowIncrement, columnIncrement, multiplier) {
 }
 
 function move(car, increment) {
-    car.style.left = car.props.left + increment + 'px' //move car
+    switch (car.facing) {
+        case 'east':
+            car.style.left = car.props.left + increment + 'px'
+            break
+        case 'south':
+            car.style.top = car.props.top + increment + 'px'
+            break
+        case 'west':
+            car.style.left = car.props.left - increment + 'px'
+            break
+        case 'north':
+            car.style.top = car.props.top - increment + 'px'
+            break
+    }
 }
 
 function turn(car, increment, currTile) {
@@ -166,19 +188,19 @@ function turn(car, increment, currTile) {
                 // E->S
                 if (!car.turn) {
                     car.turn = {
-                        p0: {x: car.coords[0], y: car.coords[1]},
-                        p1: {x: car.leadingEdge, y: currTile.row + 30},
-                        p2: {x: currTile.column + 35, y: currTile.row + 65},
+                        p0: {x: car.props.left, y: car.props.top},
+                        p1: {x: car.leadingEdge, y: currTile.row + 10},
+                        p2: {x: currTile.column + 40, y: currTile.row + 60},
                         p3: {
                             // Must account for rotation.
                             x: currTile.column + 10,
-                            y: currTile.row + 121,
+                            y: currTile.row + 100,
                         },
                         time: 0,
                         angle: '90',
+                        newFacing: 'south',
                     }
                 }
-                car.facing = 'south'
                 break
             case '90':
                 // S->W
@@ -201,9 +223,14 @@ function turn(car, increment, currTile) {
 
     if (car.turn.time >= 1) {
         console.log('Finished turn!')
-        car.style.left = car.turn.p3.x + 'px'
-        car.style.top = car.turn.p3.y + 'px'
+        let adjustedCarVals = car.getBoundingClientRect()
+        let widthDiff = adjustedCarVals.x - car.turn.p3.x
+        heightDiff = adjustedCarVals.y - car.turn.p3.y
+
+        car.style.left = car.turn.p3.x - widthDiff + 'px'
+        car.style.top = car.turn.p3.y - heightDiff + 'px'
         car.style.transform = `rotate(${car.turn.angle}deg)`
+        car.facing = car.turn.newFacing
         car.turn = undefined
         return car
     } else {
@@ -286,21 +313,41 @@ function interpolate(t, bezier) {
     return p
 }
 
-function slowToStop(car, increment, currTile) {
+function slowToStop(car, increment) {
     console.log('Time to stop!')
+    let endPoint, endPointDiff, coordinate
     switch (car.facing) {
         case 'east':
-            if (car.leadingEdge < currTile.column + 99) {
-                increment = (currTile.column + 99 - car.leadingEdge) / increment
-                if (increment < 1) {
-                    increment = 1
-                }
-                move(car, increment)
-            } else {
-                car.style.left = currTile.column + 99
-                console.log('Stopped!')
-                car.stopped = true
-            }
-            return car
+            endPoint = car.tilePos[1] + 99
+            coordinate = car.style.left
+            break
+        case 'west':
+            endPoint = car.tilePos[1]
+            coordinate = car.style.left
+            break
+        case 'south':
+            endPoint = car.tilePos[0] + 99
+            coordinate = car.style.top
+            break
+        case 'north':
+            endPoint = car.tilePos[1]
+            coordinate = car.style.top
+            break
     }
+
+    endPointDiff = Math.abs(endPoint - car.leadingEdge)
+    if (car.leadingEdge != endPoint) {
+        increment = endPointDiff / increment
+    } else {
+        coordinate = endPoint
+        console.log('Stopped!')
+        car.stopped = true
+        return car
+    }
+
+    if (increment < 1) {
+        increment = 1
+    }
+    move(car, increment)
+    return car
 }
