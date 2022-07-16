@@ -4,14 +4,7 @@ function tick() {
     } else {
         car.facing = 'east'
     }
-    if (car.stopped === undefined) {
-        car.stopped = false
-    }
-    if (car.stopped === false) {
-        drive(car, 15)
-    } else {
-        console.log('Car stopped, not running drive.')
-    }
+    drive(car, 15)
 }
 
 function drive(car, increment) {
@@ -395,8 +388,8 @@ function slowToStop(car, increment) {
         increment = endPointDiff / increment
     } else {
         coordinate = endPoint
-        console.log('Stopped!')
-        car.stopped = true
+        console.log('Reached finish, stopping!')
+        stop()
         return car
     }
 
