@@ -8,7 +8,7 @@ function tick() {
         car.stopped = false
     }
     if (car.stopped === false) {
-        drive(car, 15) //Drive the car
+        drive(car, 15)
     } else {
         console.log('Car stopped, not running drive.')
     }
@@ -92,7 +92,7 @@ function initDirection(car) {
             car.columnIncrement = 100
             break
         case 'south':
-            car.leadingEdge = Math.trunc(car.props.top + car.props.height)
+            car.leadingEdge = car.props.top + car.props.height
             car.rowIncrement = 100
             car.columnIncrement = 0
             break
@@ -188,34 +188,89 @@ function turn(car, increment, currTile) {
                 // E->S
                 if (!car.turn) {
                     car.turn = {
-                        p0: {x: car.props.left, y: car.props.top},
-                        p1: {x: car.leadingEdge, y: currTile.row + 10},
-                        p2: {x: currTile.column + 40, y: currTile.row + 60},
+                        p0: {
+                            x: car.props.left,
+                            y: car.props.top,
+                        },
+                        p1: {
+                            x: car.leadingEdge + 10,
+                            y: currTile.row + 15,
+                        },
+                        p2: {x: currTile.column + 20, y: currTile.row + 60},
                         p3: {
-                            // Must account for rotation.
+                            // Vertical roads are thinner.
                             x: currTile.column + 10,
                             y: currTile.row + 100,
                         },
                         time: 0,
-                        angle: '90',
+                        angle: 0,
                         newFacing: 'south',
                     }
                 }
                 break
             case '90':
                 // S->W
-                car.facing = 'west'
+                if (!car.turn) {
+                    car.turn = {
+                        p0: {
+                            x: car.props.left,
+                            y: car.props.top,
+                        },
+                        p1: {
+                            x: currTile.column + 10,
+                            y: car.leadingEdge,
+                        },
+                        p2: {x: currTile.column, y: currTile.row + 20},
+                        p3: {
+                            // Vertical roads are thinner.
+                            x: currTile.column - 81,
+                            y: currTile.row + 10,
+                        },
+                        time: 0,
+                        angle: 90,
+                        newFacing: 'west',
+                    }
+                }
                 break
             case '180':
                 // W->N
-                car.facing = 'north'
+                if (!car.turn) {
+                    car.turn = {
+                        p0: {x: car.props.left, y: car.props.top},
+                        p1: {x: car.leadingEdge - 15, y: currTile.row + 10},
+                        p2: {x: currTile.column + 10, y: currTile.row + 15},
+                        p3: {
+                            // Vertical roads are thinner.
+                            x: currTile.column + 10,
+                            y: currTile.row - 81,
+                        },
+                        time: 0,
+                        angle: 180,
+                        newFacing: 'north',
+                    }
+                }
                 break
             case '270':
                 // N->E
-                car.facing = 'east'
+                if (!car.turn) {
+                    car.turn = {
+                        p0: {x: car.props.left, y: car.props.top},
+                        p1: {x: currTile.column + 0, y: car.leadingEdge - 50},
+                        p2: {x: currTile.column + 60, y: currTile.row},
+                        p3: {
+                            // Vertical roads are thinner.
+                            x: currTile.column + 100,
+                            y: currTile.row + 10,
+                        },
+                        time: 0,
+                        angle: 270,
+                        newFacing: 'east',
+                    }
+                }
                 break
         }
     }
+
     if (!car.turn.points) {
         car = calculateBezierPath(car)
     }
@@ -223,13 +278,12 @@ function turn(car, increment, currTile) {
 
     if (car.turn.time >= 1) {
         console.log('Finished turn!')
-        let adjustedCarVals = car.getBoundingClientRect()
-        let widthDiff = adjustedCarVals.x - car.turn.p3.x
-        heightDiff = adjustedCarVals.y - car.turn.p3.y
+        let widthDiff = car.props.left - car.turn.p3.x
+        heightDiff = car.props.y - car.turn.p3.y
 
         car.style.left = car.turn.p3.x - widthDiff + 'px'
         car.style.top = car.turn.p3.y - heightDiff + 'px'
-        car.style.transform = `rotate(${car.turn.angle}deg)`
+        car.style.transform = `rotate(${car.turn.angle + 90 * 1}deg)`
         car.facing = car.turn.newFacing
         car.turn = undefined
         return car
@@ -243,7 +297,8 @@ function turn(car, increment, currTile) {
 function moveAlongBezier(car) {
     car.style.left = car.turn.point.x + 'px'
     car.style.top = car.turn.point.y + 'px'
-    car.style.transform = `rotate(${90 * car.turn.time}deg)`
+    // car.turn.angle = 90 * car.turn.time
+    car.style.transform = `rotate(${car.turn.angle + 90 * car.turn.time}deg)`
 }
 
 function calculateBezierPath(car) {
