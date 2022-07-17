@@ -21,9 +21,6 @@ function drive(car, increment) {
             case 't':
                 car = turn(car, increment, currTile)
                 break
-            case 'i':
-                // Check intersection
-                break
             case 'f':
                 increment = increment / 2.5
                 car = slowToStop(car, increment)
@@ -44,7 +41,8 @@ function drive(car, increment) {
                         move(car, increment)
                         break
                     case 'i':
-                        // Check intersection
+                        // Slow & check intersection
+                        checkIntersection(car, increment, next)
                         break
                     case 'g':
                     case 'undefined':
@@ -104,7 +102,7 @@ function initDirection(car) {
 }
 
 function getTilePosition(car) {
-    let row, column, x, y, xResult, yResult
+    let row, column, x, xResult, yResult
     if (car.facing === 'west' || car.facing === 'east') {
         x = car.props.top
     } else {
@@ -151,6 +149,110 @@ function getTile(row, column, rowIncrement, columnIncrement, multiplier) {
         row: row + rowIncrement,
         column: column + columnIncrement,
     }
+}
+
+function checkIntersection(car, increment, iTile) {
+    // If at any point a car is detected
+    // two tiles to the left of I, slow to stop.
+    // Else enter intersection.
+    let rowIncrement, columnIncrement, multiplier
+    switch (car.facing) {
+        case 'east':
+            rowIncrement = 100
+            columnIncrement = 0
+            break
+        case 'south':
+            rowIncrement = 0
+            columnIncrement = 100
+            break
+        case 'west':
+            rowIncrement = -100
+            columnIncrement = 0
+            break
+        case 'north':
+            rowIncrement = 0
+            columnIncrement = -100
+            break
+    }
+    multiplier = 2
+    let row = iTile.row
+    let column = iTile.column
+    let leftOne = getTile(row, column, rowIncrement, columnIncrement)
+    if (leftOne.type === 't') {
+        switch (leftOne.getAttribute('data-square-meta')) {
+            case '0':
+                if (car.facing === 'south') {
+                    columnIncrement += 100
+                } else {
+                    rowIncrement += -100
+                }
+                multiplier = undefined
+                break
+            case '90':
+                if (car.facing === 'south') {
+                    columnIncrement += -100
+                } else {
+                    columnIncrement += 100
+                }
+                multiplier = undefined
+                break
+            case '180':
+                if (car.facing === 'north') {
+                    rowIncrement += -100
+                } else {
+                    columnIncrement += 100
+                }
+                multiplier = undefined
+                break
+            case '270':
+                if (car.facing === 'north') {
+                    rowIncrement = +100
+                } else {
+                    columnIncrement += 100
+                }
+                multiplier = undefined
+                break
+        }
+    }
+    let leftTwo = getTile(
+        row,
+        column,
+        rowIncrement,
+        columnIncrement,
+        multiplier
+    )
+    let check1 = checkTileForCars(leftOne)
+    let check2 = checkTileForCars(leftTwo)
+    if (check1 || check2) {
+        slowToStop(car, increment)
+    } else {
+        move(car, increment)
+    }
+}
+
+function checkTileForCars(tile) {
+    let cars = document.getElementsByClassName('car')
+    for (let car of cars) {
+        if (car.facing === 'north' || car.facing === 'south') {
+            if (
+                car.leadingEdge >= tile.column &&
+                car.leadingEdge <= tile.column + 100
+            ) {
+                console.log('Car detected in tile.')
+                return true
+            }
+        } else {
+            if (
+                car.leadingEdge >= tile.row &&
+                car.leadingEdge <= tile.row + 100
+            ) {
+                // Stop
+                console.log('Car detected in tile.')
+                return true
+            }
+        }
+    }
+    return false
 }
 
 function move(car, increment) {
@@ -290,7 +392,6 @@ function turn(car, increment, currTile) {
 function moveAlongBezier(car) {
     car.style.left = car.turn.point.x + 'px'
     car.style.top = car.turn.point.y + 'px'
-    // car.turn.angle = 90 * car.turn.time
     car.style.transform = `rotate(${car.turn.angle + 90 * car.turn.time}deg)`
 }
 
