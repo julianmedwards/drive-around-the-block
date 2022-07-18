@@ -1,11 +1,13 @@
 function tick() {
-    let car = document.querySelector('#mainCar') //get reference to car
-    if (car.facing) {
-    } else {
-        car.facing = 'east'
-        car.angle = 0
+    let cars = document.getElementsByClassName('car')
+    for (let car of cars) {
+        if (car.facing) {
+        } else {
+            car.facing = 'east'
+            car.angle = 0
+        }
+        drive(car, 15)
     }
-    drive(car, 15)
 }
 
 function drive(car, increment) {
@@ -437,10 +439,10 @@ function turn(car, increment, currTile) {
         }
     }
 
-    if (!car.turn.points) {
+    if (!car.turn.point) {
         car = calculateBezierPath(car)
     }
-    car.turn.point = interpolate(car.turn.time, car.turn.points)
+    car.turn.point = interpolate(car.turn.time, car.bezierPoints)
 
     if (car.turn.time >= 1) {
         console.log('Finished turn!')
@@ -478,9 +480,16 @@ function moveAlongBezier(car) {
 
 function calculateBezierPath(car) {
     // Add a button to HUD that toggles this.
-    showBezierPoints(car.turn.p0, car.turn.p1, car.turn.p2, car.turn.p3)
 
-    car.turn.points = bezier(car.turn.p0, car.turn.p1, car.turn.p2, car.turn.p3)
+    car.bezierPoints = bezier(
+        car.turn.p0,
+        car.turn.p1,
+        car.turn.p2,
+        car.turn.p3
+    )
+    if (globalStates.showBezierPoints) {
+        showBezierPoints(car.turn.p0, car.turn.p1, car.turn.p2, car.turn.p3)
+    }
 
     return car
 }

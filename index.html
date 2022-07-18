@@ -19,14 +19,21 @@
       <input type="button" value="Start" onclick="start()" />
       <input type="button" value="Stop" onclick="stop()" />
       <input type="button" value="Reset" onclick="reset()" />
+      <input
+        id="bezier-btn"
+        type="button"
+        value="Show Bezier Points"
+        onclick="toggleBezierPoints()"
+      />
     </div>
     <div>
       <div
         id="p0"
+        class="bezier-point"
         style="
           display: none;
           position: absolute;
-          background-color: yellow;
+          background-color: magenta;
           width: 5px;
           height: 5px;
           content: '';
@@ -35,6 +42,7 @@
       ></div>
       <div
         id="p1"
+        class="bezier-point"
         style="
           display: none;
           position: absolute;
@@ -47,6 +55,7 @@
       ></div>
       <div
         id="p2"
+        class="bezier-point"
         style="
           display: none;
           position: absolute;
@@ -59,10 +68,11 @@
       ></div>
       <div
         id="p3"
+        class="bezier-point"
         style="
           display: none;
           position: absolute;
-          background-color: yellow;
+          background-color: magenta;
           width: 5px;
           height: 5px;
           content: '';

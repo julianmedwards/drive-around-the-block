@@ -273,12 +273,15 @@ var images = [
 ]
 
 let timerId
-let direction = 'east'
+let globalStates = {showBezierPoints: false}
 
 function reset() {
     console.clear()
     stop()
-    direction = 'east'
+    let points = document.getElementsByClassName('bezier-point')
+    for (let point of points) {
+        point.style.display = 'none'
+    }
     var board = document.querySelector('#game-board')
     board.innerHTML = ''
     loadGame()
@@ -408,4 +411,19 @@ function addSquare(square, squareTop, squareLeft) {
     }
 
     gameBoard.appendChild(img)
+}
+
+function toggleBezierPoints() {
+    if (globalStates.showBezierPoints) {
+        globalStates.showBezierPoints = false
+        let points = document.getElementsByClassName('bezier-point')
+        document.getElementById('bezier-btn').style.backgroundColor =
+            'buttonface'
+        for (let point of points) {
+            point.style.display = 'none'
+        }
+    } else {
+        globalStates.showBezierPoints = true
+        document.getElementById('bezier-btn').style.backgroundColor = '#808080'
+    }
 }
