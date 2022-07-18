@@ -3,6 +3,7 @@ function tick() {
     if (car.facing) {
     } else {
         car.facing = 'east'
+        car.angle = 0
     }
     drive(car, 15)
 }
@@ -282,84 +283,154 @@ function turn(car, increment, currTile) {
             case '0':
                 // E->S
                 if (!car.turn) {
-                    car.turn = {
-                        p0: {
-                            x: car.props.left,
-                            y: car.props.top,
-                        },
-                        p1: {
-                            x: car.leadingEdge + 10,
-                            y: currTile.row + 15,
-                        },
-                        p2: {x: currTile.column + 20, y: currTile.row + 60},
-                        p3: {
-                            // Vertical roads are thinner.
-                            x: currTile.column + 10,
-                            y: currTile.row + 100,
-                        },
-                        time: 0,
-                        angle: 0,
-                        newFacing: 'south',
+                    if (car.facing === 'east') {
+                        car.turn = {
+                            p0: {
+                                x: car.props.left,
+                                y: car.props.top,
+                            },
+                            p1: {
+                                x: car.leadingEdge + 10,
+                                y: currTile.row + 15,
+                            },
+                            p2: {x: currTile.column + 20, y: currTile.row + 60},
+                            p3: {
+                                // Vertical roads are thinner.
+                                x: currTile.column + 10,
+                                y: currTile.row + 100,
+                            },
+                            time: 0,
+                            newFacing: 'south',
+                        }
+                    } else {
+                        // car facing north
+                        car.turn = {
+                            p0: {x: car.props.left, y: car.props.top},
+                            p1: {
+                                x: currTile.column + 25,
+                                y: car.leadingEdge - 25,
+                            },
+                            p2: {x: currTile.column, y: currTile.row + 10},
+                            p3: {
+                                // Vertical roads are thinner.
+                                x: currTile.column - 81,
+                                y: currTile.row + 10,
+                            },
+                            time: 0,
+                            reverseAngle: true,
+                            newFacing: 'west',
+                        }
                     }
                 }
                 break
             case '90':
                 // S->W
                 if (!car.turn) {
-                    car.turn = {
-                        p0: {
-                            x: car.props.left,
-                            y: car.props.top,
-                        },
-                        p1: {
-                            x: currTile.column + 10,
-                            y: car.leadingEdge,
-                        },
-                        p2: {x: currTile.column, y: currTile.row + 20},
-                        p3: {
-                            // Vertical roads are thinner.
-                            x: currTile.column - 81,
-                            y: currTile.row + 10,
-                        },
-                        time: 0,
-                        angle: 90,
-                        newFacing: 'west',
+                    if (car.facing === 'south') {
+                        car.turn = {
+                            p0: {
+                                x: car.props.left,
+                                y: car.props.top,
+                            },
+                            p1: {
+                                x: currTile.column + 10,
+                                y: car.leadingEdge,
+                            },
+                            p2: {x: currTile.column, y: currTile.row + 20},
+                            p3: {
+                                // Vertical roads are thinner.
+                                x: currTile.column - 81,
+                                y: currTile.row + 10,
+                            },
+                            time: 0,
+                            newFacing: 'west',
+                        }
+                    } else {
+                        // car facing east
+                        car.turn = {
+                            p0: {x: car.props.left, y: car.props.top},
+                            p1: {x: currTile.column, y: currTile.row},
+                            p2: {x: currTile.column + 15, y: currTile.row - 10},
+                            p3: {
+                                // Vertical roads are thinner.
+                                x: currTile.column + 10,
+                                y: currTile.row - 81,
+                            },
+                            time: 0,
+                            reverseAngle: true,
+                            newFacing: 'north',
+                        }
                     }
                 }
                 break
             case '180':
                 // W->N
                 if (!car.turn) {
-                    car.turn = {
-                        p0: {x: car.props.left, y: car.props.top},
-                        p1: {x: car.leadingEdge - 15, y: currTile.row + 10},
-                        p2: {x: currTile.column + 10, y: currTile.row + 15},
-                        p3: {
-                            // Vertical roads are thinner.
-                            x: currTile.column + 10,
-                            y: currTile.row - 81,
-                        },
-                        time: 0,
-                        angle: 180,
-                        newFacing: 'north',
+                    if (car.facing === 'west') {
+                        car.turn = {
+                            p0: {x: car.props.left, y: car.props.top},
+                            p1: {x: car.leadingEdge - 15, y: currTile.row + 10},
+                            p2: {x: currTile.column + 10, y: currTile.row + 15},
+                            p3: {
+                                // Vertical roads are thinner.
+                                x: currTile.column + 10,
+                                y: currTile.row - 81,
+                            },
+                            time: 0,
+                            newFacing: 'north',
+                        }
+                    } else {
+                        // car facing south
+                        car.turn = {
+                            p0: {x: car.props.left, y: car.props.top},
+                            p1: {x: currTile.column + 10, y: currTile.row + 15},
+                            p2: {x: currTile.column + 80, y: currTile.row + 15},
+                            p3: {
+                                // Vertical roads are thinner.
+                                x: currTile.column + 100,
+                                y: currTile.row + 10,
+                            },
+                            time: 0,
+                            reverseAngle: true,
+                            newFacing: 'east',
+                        }
                     }
                 }
                 break
             case '270':
                 // N->E
                 if (!car.turn) {
-                    car.turn = {
-                        p0: {x: car.props.left, y: car.props.top},
-                        p1: {x: currTile.column + 0, y: car.leadingEdge - 50},
-                        p2: {x: currTile.column + 60, y: currTile.row},
-                        p3: {
-                            // Vertical roads are thinner.
-                            x: currTile.column + 100,
-                            y: currTile.row + 10,
-                        },
-                        time: 0,
-                        angle: 270,
-                        newFacing: 'east',
+                    if ((car.facing = 'north')) {
+                        car.turn = {
+                            p0: {x: car.props.left, y: car.props.top},
+                            p1: {
+                                x: currTile.column + 0,
+                                y: car.leadingEdge - 50,
+                            },
+                            p2: {x: currTile.column + 60, y: currTile.row},
+                            p3: {
+                                // Vertical roads are thinner.
+                                x: currTile.column + 100,
+                                y: currTile.row + 10,
+                            },
+                            time: 0,
+                            newFacing: 'east',
+                        }
+                    } else {
+                        // car facing west
+                        car.turn = {
+                            p0: {x: car.props.left, y: car.props.top},
+                            p1: {x: car.leadingEdge - 15, y: currTile.row + 10},
+                            p2: {x: currTile.column + 10, y: currTile.row + 15},
+                            p3: {
+                                // Vertical roads are thinner.
+                                x: currTile.column + 10,
+                                y: currTile.row + 100,
+                            },
+                            time: 0,
+                            reverseAngle: true,
+                            newFacing: 'south',
+                        }
                     }
                 }
                 break
@@ -378,7 +449,13 @@ function turn(car, increment, currTile) {
 
         car.style.left = car.turn.p3.x - widthDiff + 'px'
         car.style.top = car.turn.p3.y - heightDiff + 'px'
-        car.style.transform = `rotate(${car.turn.angle + 90 * 1}deg)`
+        if (car.turn.reverseAngle) {
+            car.angle -= 90
+            car.style.transform = `rotate(${car.angle}deg)`
+        } else {
+            car.angle += 90
+            car.style.transform = `rotate(${car.angle}deg)`
+        }
         car.facing = car.turn.newFacing
         car.turn = undefined
         return car
@@ -392,7 +469,11 @@ function turn(car, increment, currTile) {
 function moveAlongBezier(car) {
     car.style.left = car.turn.point.x + 'px'
     car.style.top = car.turn.point.y + 'px'
-    car.style.transform = `rotate(${car.turn.angle + 90 * car.turn.time}deg)`
+    if (car.turn.reverseAngle) {
+        car.style.transform = `rotate(${car.angle - 90 * car.turn.time}deg)`
+    } else {
+        car.style.transform = `rotate(${car.angle + 90 * car.turn.time}deg)`
+    }
 }
 
 function calculateBezierPath(car) {
