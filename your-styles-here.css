@@ -6,3 +6,23 @@
     position: relative;
     top: 21px;
 }
+
+.bezier-point {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    content: '';
+    z-index: 1000;
+}
+.end-point {
+    background-color: magenta;
+}
+.mid-point {
+    background-color: cyan;
+}
+.hidden {
+    display: none;
+}
+.visible {
+    display: initial;
+}

@@ -278,13 +278,15 @@ let globalStates = {showBezierPoints: false}
 function reset() {
     console.clear()
     stop()
-    let points = document.getElementsByClassName('bezier-point')
-    for (let point of points) {
-        point.style.display = 'none'
-    }
     var board = document.querySelector('#game-board')
     board.innerHTML = ''
     loadGame()
+    if (globalStates.showBezierPoints) {
+        let points = document.getElementsByClassName('bezier-point')
+        for (let point of points) {
+            point.classList.replace('visible', 'hidden')
+        }
+    }
 }
 
 function start() {
@@ -311,6 +313,11 @@ function redraw() {
 }
 
 function loadGame() {
+    var gameBoard = document.getElementById('game-board')
+    var bezierPoints = document.createElement('div')
+    bezierPoints.id = 'bezier-points'
+    gameBoard.append(bezierPoints)
+
     var menu = document.querySelector('#game-picker')
     var trackid = menu[menu.selectedIndex].id
     paintTrack(trackid)
@@ -332,6 +339,7 @@ function showCar(id) {
             'px;left:' +
             window.getComputedStyle(start).left
     )
+    createBezierEls(car)
     car.appendChild(carImg)
     gameBoard.appendChild(car)
 }
@@ -413,14 +421,32 @@ function addSquare(square, squareTop, squareLeft) {
     gameBoard.appendChild(img)
 }
 
+function createBezierEls(car) {
+    let pointDiv = document.getElementById('bezier-points')
+    let p0 = document.createElement('div')
+    p0.classList.add('bezier-point', 'end-point', 'hidden')
+    p0.id = car.id + 'p0'
+    let p1 = document.createElement('div')
+    p1.classList.add('bezier-point', 'mid-point', 'hidden')
+    p1.id = car.id + 'p1'
+    let p2 = document.createElement('div')
+    p2.classList.add('bezier-point', 'mid-point', 'hidden')
+    p2.id = car.id + 'p2'
+    let p3 = document.createElement('div')
+    p3.classList.add('bezier-point', 'end-point', 'hidden')
+    p3.id = car.id + 'p3'
+
+    pointDiv.append(p0, p1, p2, p3)
+}
+
 function toggleBezierPoints() {
-    if (globalStates.showBezierPoints) {
+    if (globalStates.showBezierPoints === true) {
         globalStates.showBezierPoints = false
         let points = document.getElementsByClassName('bezier-point')
         document.getElementById('bezier-btn').style.backgroundColor =
             'buttonface'
         for (let point of points) {
-            point.style.display = 'none'
+            point.classList.replace('visible', 'hidden')
         }
     } else {
         globalStates.showBezierPoints = true

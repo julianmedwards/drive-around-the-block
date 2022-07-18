@@ -488,30 +488,10 @@ function calculateBezierPath(car) {
         car.turn.p3
     )
     if (globalStates.showBezierPoints) {
-        showBezierPoints(car.turn.p0, car.turn.p1, car.turn.p2, car.turn.p3)
+        showBezierPoints(car)
     }
 
     return car
-}
-
-function showBezierPoints(p0, p1, p2, p3) {
-    let p0El = document.getElementById('p0')
-    let p1El = document.getElementById('p1')
-    let p2El = document.getElementById('p2')
-    let p3El = document.getElementById('p3')
-
-    p0El.style.display = 'initial'
-    p0El.style.left = p0.x + 'px'
-    p0El.style.top = p0.y + 'px'
-    p1El.style.display = 'initial'
-    p1El.style.left = p1.x + 'px'
-    p1El.style.top = p1.y + 'px'
-    p2El.style.display = 'initial'
-    p2El.style.left = p2.x + 'px'
-    p2El.style.top = p2.y + 'px'
-    p3El.style.display = 'initial'
-    p3El.style.left = p3.x + 'px'
-    p3El.style.top = p3.y + 'px'
 }
 
 let Vector = function (x, y) {
@@ -550,6 +530,29 @@ function interpolate(t, bezier) {
     p = p.add(bezier.p3.multiply(ttt))
 
     return p
+}
+
+function showBezierPoints(car) {
+    let p0El = document.getElementById(car.id + 'p0')
+    let p1El = document.getElementById(car.id + 'p1')
+    let p2El = document.getElementById(car.id + 'p2')
+    let p3El = document.getElementById(car.id + 'p3')
+
+    p0El.style.left = car.turn.p0.x + 'px'
+    p0El.style.top = car.turn.p0.y + 'px'
+    p0El.classList.replace('hidden', 'visible')
+
+    p1El.style.left = car.turn.p1.x + 'px'
+    p1El.style.top = car.turn.p1.y + 'px'
+    p1El.classList.replace('hidden', 'visible')
+
+    p2El.style.left = car.turn.p2.x + 'px'
+    p2El.style.top = car.turn.p2.y + 'px'
+    p2El.classList.replace('hidden', 'visible')
+
+    p3El.style.left = car.turn.p3.x + 'px'
+    p3El.style.top = car.turn.p3.y + 'px'
+    p3El.classList.replace('hidden', 'visible')
 }
 
 function slowToStop(car, increment) {
