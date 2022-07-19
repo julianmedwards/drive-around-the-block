@@ -25,7 +25,7 @@ function drive(car, increment) {
                 car = turn(car, increment, currTile)
                 break
             case 'f':
-                increment = increment / 2.5
+                increment = increment
                 car = slowToStop(car, increment)
                 break
             default:
@@ -49,7 +49,7 @@ function drive(car, increment) {
                         break
                     case 'g':
                     case 'undefined':
-                        car = slowToStop(car, increment)
+                        car = slowToStop(car, increment / 2)
                         break
                     default:
                         let following = getTile(
@@ -227,7 +227,7 @@ function checkIntersection(car, increment, iTile) {
     let check1 = checkTileForCars(leftOne)
     let check2 = checkTileForCars(leftTwo)
     if (check1 || check2) {
-        slowToStop(car, increment)
+        slowToStop(car, increment / 2)
     } else {
         move(car, increment)
     }
@@ -557,23 +557,19 @@ function showBezierPoints(car) {
 
 function slowToStop(car, increment) {
     console.log('Time to stop!')
-    let endPoint, endPointDiff, coordinate
+    let endPoint, endPointDiff
     switch (car.facing) {
         case 'east':
             endPoint = car.tilePos[1] + 99
-            coordinate = car.style.left
             break
         case 'west':
             endPoint = car.tilePos[1]
-            coordinate = car.style.left
             break
         case 'south':
             endPoint = car.tilePos[0] + 99
-            coordinate = car.style.top
             break
         case 'north':
             endPoint = car.tilePos[1]
-            coordinate = car.style.top
             break
     }
 
@@ -581,7 +577,6 @@ function slowToStop(car, increment) {
     if (car.leadingEdge != endPoint) {
         increment = endPointDiff / increment
     } else {
-        coordinate = endPoint
         console.log('Reached finish, stopping!')
         stop()
         return car
