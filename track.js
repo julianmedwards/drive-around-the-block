@@ -344,6 +344,27 @@ function showCar(id) {
     gameBoard.appendChild(car)
 }
 
+function spawnNewCar() {
+    var gameBoard = document.querySelector('#game-board')
+    var start = document.querySelector('#start')
+    var car = document.createElement('div')
+    var carImg = document.createElement('img')
+    carImg.setAttribute('src', 'art/car-dragon.png')
+    let id = Date.now()
+    car.setAttribute('id', id)
+    car.classList.add('car')
+    car.setAttribute(
+        'style',
+        'top:' +
+            (getCompTop(start) + 9) +
+            'px;left:' +
+            window.getComputedStyle(start).left
+    )
+    createBezierEls(car)
+    car.appendChild(carImg)
+    gameBoard.appendChild(car)
+}
+
 function getProps(element) {
     var ce = window.getComputedStyle(element)
     var props = {
