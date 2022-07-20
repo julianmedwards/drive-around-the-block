@@ -44,7 +44,6 @@ function drive(car, increment) {
                         move(car, increment)
                         break
                     case 'i':
-                        // Slow & check intersection
                         checkIntersection(car, increment, next)
                         break
                     case 'g':
@@ -154,10 +153,9 @@ function getTile(row, column, rowIncrement, columnIncrement, multiplier) {
     }
 }
 
+// If a car is detected in the intersection or two tiles along the road
+// on the left, yield (slow to stop and wait until I + 2 tiles is clear)
 function checkIntersection(car, increment, iTile) {
-    // If at any point a car is detected
-    // two tiles to the left of I, slow to stop.
-    // Else enter intersection.
     let iOccupied = checkTileForCars(car, iTile)
     if (iOccupied) {
         slowToStop(car, increment / 2)
@@ -294,7 +292,6 @@ function turn(car, increment, currTile) {
                             },
                             p2: {x: currTile.column + 20, y: currTile.row + 60},
                             p3: {
-                                // Vertical roads are thinner.
                                 x: currTile.column + 10,
                                 y: currTile.row + 100,
                             },
@@ -311,7 +308,6 @@ function turn(car, increment, currTile) {
                             },
                             p2: {x: currTile.column, y: currTile.row + 10},
                             p3: {
-                                // Vertical roads are thinner.
                                 x: currTile.column - 81,
                                 y: currTile.row + 10,
                             },
@@ -385,7 +381,6 @@ function turn(car, increment, currTile) {
                             p1: {x: currTile.column + 10, y: currTile.row + 15},
                             p2: {x: currTile.column + 80, y: currTile.row + 15},
                             p3: {
-                                // Vertical roads are thinner.
                                 x: currTile.column + 100,
                                 y: currTile.row + 10,
                             },
@@ -408,7 +403,6 @@ function turn(car, increment, currTile) {
                             },
                             p2: {x: currTile.column + 60, y: currTile.row},
                             p3: {
-                                // Vertical roads are thinner.
                                 x: currTile.column + 100,
                                 y: currTile.row + 10,
                             },
@@ -422,7 +416,6 @@ function turn(car, increment, currTile) {
                             p1: {x: car.leadingEdge - 15, y: currTile.row + 10},
                             p2: {x: currTile.column + 10, y: currTile.row + 15},
                             p3: {
-                                // Vertical roads are thinner.
                                 x: currTile.column + 10,
                                 y: currTile.row + 100,
                             },
@@ -476,8 +469,6 @@ function moveAlongBezier(car) {
 }
 
 function calculateBezierPath(car) {
-    // Add a button to HUD that toggles this.
-
     car.bezierPoints = bezier(
         car.turn.p0,
         car.turn.p1,
